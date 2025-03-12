@@ -41,17 +41,20 @@ def random_date():
 
 contacts = []
 for i in range(num_contacts):
+    firstname = test_data.first_name()
+    lastname = test_data.last_name()
+    email = f"{firstname[0].lower()}{lastname.lower()}{random.randint(100, 999)}@example.com"
     contacts.append({
         "contactid": client_prefix + str(i),
-        "firstname": test_data.first_name(),
-        "lastname": test_data.last_name(),
-        "email": test_data.email(),
+        "firstname": firstname,
+        "lastname": lastname,
+        "email": email,
         "country": random.choice(countries),
         "age": random.randint(18, 84),
         "hasMobileApp": random.choices([True, False], weights=[0.4, 0.6])[0],
         "emailOptin": random.choices([True, False], weights=[0.78, 0.22])[0],
-        "RFM": random.choices([1, 2, 3, 4, 5, 6, 7, 8, 9], weights=[0.02, 0.06, 0.16, 0.19, 0.22, 0.15, 0.09, 0.08, 0.03])[0]
-        "Segment": random.choices(["VIC", "Regular", "1-timer", "Inactive"], weights=[0.05, 0.6, 0.1, 0.25])[0]
+        "RFM": random.choices([1, 2, 3, 4, 5, 6, 7, 8, 9], weights=[0.02, 0.06, 0.16, 0.19, 0.22, 0.15, 0.09, 0.08, 0.03])[0],
+        "segment": random.choices(["VIC", "Regular", "1-timer", "Inactive"], weights=[0.05, 0.6, 0.1, 0.25])[0]
     })
 
 # Génération des tickets (cases)
@@ -119,16 +122,38 @@ for contact in contacts:
 
         order_id_counter += 1
 
+# Génération des engagements web et mobile
+engagements = []
+engagement_id_counter = 1
+
+for contact in contacts:
+    num_engagements = random.randint(0, 10)  # entre 0 et 10 engagements par contact
+    for _ in range(num_engagements):
+        engagement_type = random.choice(["View product", "Add to cart", "Login", "Check-out", "Search"])
+        sku = random.choice(product_catalog)["id"] if engagement_type == "View product" else ""
+        engagements.append({
+            "EngagementID": f"ENGAG{engagement_id_counter}",
+            "EngagementDate": random_date(),
+            "browser": random.choice(["Firefox", "Edge", "Chrome", "Safari"]),
+            "device": random.choices(["Mobile", "Web"], weights=[0.55, 0.45])[0],
+            "engagementType": engagement_type,
+            "SKU": sku,
+            "webCookie": ''.join(random.choices('abcdefghijklmnopqrstuvwxyz0123456789', k=24)),
+            "IndividualID": random.choices([contact["contactid"], ""], weights=[0.8, 0.2])[0]
+        })
+        engagement_id_counter += 1
+
 # Function to save data to CSV
 def save_to_csv(data, filename, fieldnames):
     df = pd.DataFrame(data, columns=fieldnames)
     df.to_csv(filename, index=False, encoding="utf-8")
 
 # Création des fichiers
-save_to_csv(contacts, "contacts.csv", ["contactid", "firstname", "lastname", "email", "country", "age", "hasMobileApp", "emailOptin", "RFM","Segment"])
+save_to_csv(contacts, "contacts.csv", ["contactid", "firstname", "lastname", "email", "country", "age", "hasMobileApp", "emailOptin", "RFM","segment"])
 save_to_csv(product_catalog, "products.csv", ["id", "name", "category", "price"])
 save_to_csv(orders, "orders.csv", ["orderid", "order_date", "contactid", "total_price"])
 save_to_csv(order_lines, "order_lines.csv", ["lineID", "orderid", "productid", "quantity"])
+save_to_csv(engagements, "WebMobileEngagement.csv", ["EngagementID", "EngagementDate", "browser", "device", "engagementType", "SKU", "webCookie", "IndividualID"])
 df_cases.to_csv("cases.csv", index=False, encoding="utf-8")
 
 print("CSV files generated successfully!")
@@ -435,6 +460,5 @@ address
  zipcode
  zipcode_in_state
  zipcode_plus4
-'''
 
 
