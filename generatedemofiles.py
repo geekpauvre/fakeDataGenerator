@@ -42,12 +42,16 @@ def random_date():
 contacts = []
 for i in range(num_contacts):
     contacts.append({
-        "contactid": client_prefix + str(i) ,
-        "firstname":test_data.first_name(),  
-        "lastname": test_data.last_name(),   
-        "email":test_data.email(),
-        # liste des données de Faker en fin de fichier
-        "country": random.choice(countries)
+        "contactid": client_prefix + str(i),
+        "firstname": test_data.first_name(),
+        "lastname": test_data.last_name(),
+        "email": test_data.email(),
+        "country": random.choice(countries),
+        "age": random.randint(18, 84),
+        "hasMobileApp": random.choices([True, False], weights=[0.4, 0.6])[0],
+        "emailOptin": random.choices([True, False], weights=[0.78, 0.22])[0],
+        "RFM": random.choices([1, 2, 3, 4, 5, 6, 7, 8, 9], weights=[0.02, 0.06, 0.16, 0.19, 0.22, 0.15, 0.09, 0.08, 0.03])[0]
+        "Segment": random.choices(["VIC", "Regular", "1-timer", "Inactive"], weights=[0.05, 0.6, 0.1, 0.25])[0]
     })
 
 # Génération des tickets (cases)
@@ -121,7 +125,7 @@ def save_to_csv(data, filename, fieldnames):
     df.to_csv(filename, index=False, encoding="utf-8")
 
 # Création des fichiers
-save_to_csv(contacts, "contacts.csv", ["contactid", "firstname", "lastname", "email", "country"])
+save_to_csv(contacts, "contacts.csv", ["contactid", "firstname", "lastname", "email", "country", "age", "hasMobileApp", "emailOptin", "RFM","Segment"])
 save_to_csv(product_catalog, "products.csv", ["id", "name", "category", "price"])
 save_to_csv(orders, "orders.csv", ["orderid", "order_date", "contactid", "total_price"])
 save_to_csv(order_lines, "order_lines.csv", ["lineID", "orderid", "productid", "quantity"])
@@ -432,6 +436,5 @@ address
  zipcode_in_state
  zipcode_plus4
 '''
-
 
 
